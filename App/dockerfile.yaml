@@ -1,0 +1,41 @@
+---
+apiVersion: "apps/v1"
+kind: "Deployment"
+metadata:
+  name: "dockerfiledb"
+  namespace: "default"
+  labels:
+    app: "dockerfiledb"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: "dockerfiledb"
+  template:
+    metadata:
+      labels:
+        app: "dockerfiledb"
+    spec:
+      containers:
+      - name: "dockerfiledb-sha256-1"
+        image: "gcr.io/gcpdemo-334906/github.com/laxmisindhu123/dockerfiledb@sha256:347aac4f7bf32bb1b877a183a6c13159a7d20f7f0e567847b941eb2c69ae9c76"
+---
+apiVersion: "autoscaling/v2beta1"
+kind: "HorizontalPodAutoscaler"
+metadata:
+  name: "dockerfiledb-hpa-euql"
+  namespace: "default"
+  labels:
+    app: "dockerfiledb"
+spec:
+  scaleTargetRef:
+    kind: "Deployment"
+    name: "dockerfiledb"
+    apiVersion: "apps/v1"
+    minReplicas: 1
+  maxReplicas: 5
+  metrics:
+  - type: "Resource"
+    resource:
+      name: "cpu"
+      targetAverageUtilization: 80
